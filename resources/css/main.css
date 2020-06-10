@@ -1,0 +1,11 @@
+@import "tailwindcss/base";
+
+@import "tailwindcss/components";
+
+@import "tailwindcss/utilities";
+
+
+.card {
+    @apply .bg-white .p-5 .shadow;
+    border-radius: 8px;
+}
