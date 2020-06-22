@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Setup\ProjectFactory;
 use Tests\TestCase;
 
 class ProjectTasksTest extends TestCase
@@ -35,11 +36,11 @@ class ProjectTasksTest extends TestCase
     {
         $this->signIn();
 
-        $project = factory('App\Project')->create();
+        $project = app(ProjectFactory::class)
+            ->withTasks(1)
+            ->create();
 
-        $task = $project->addTask('test task');
-
-        $this->patch($task->path(), ['body' => 'changed'])
+        $this->patch($project->tasks->first()->path(), ['body' => 'changed'])
             ->assertStatus(403);
 
         $this->assertDatabaseMissing('tasks', ['body' => 'changed']);
@@ -48,11 +49,13 @@ class ProjectTasksTest extends TestCase
 
     public function test_a_project_can_have_tasks()
     {
-        $this->withoutExceptionHandling();
+//        $this->signIn();
+//
+//        $project = factory(Project::class)->create(['owner_id' => auth()->id()]);
 
-        $this->signIn();
-
-        $project = factory(Project::class)->create(['owner_id' => auth()->id()]);
+        $project = app(ProjectFactory::class)
+            ->ownedBy($this->signIn())
+            ->create();
 
         $this->post($project->path() . '/tasks', ['body' => 'Florem Ipsilum']);
 
@@ -61,9 +64,13 @@ class ProjectTasksTest extends TestCase
 
     public function test_a_task_requires_a_body()
     {
-        $this->signIn();
+//        $this->signIn();
+//
+//        $project = factory(Project::class)->create(['owner_id' => auth()->id()]);
 
-        $project = factory(Project::class)->create(['owner_id' => auth()->id()]);
+        $project = app(ProjectFactory::class)
+            ->ownedBy($this->signIn())
+            ->create();
 
         $attributes = factory('App\Task')->raw(['body' => '']);
 
@@ -73,15 +80,16 @@ class ProjectTasksTest extends TestCase
 
     public function test_a_task_can_be_updated()
     {
-        $this->withoutExceptionHandling();
+        $project = app(ProjectFactory::class)
+            ->ownedBy($this->signIn())
+            ->withTasks(1)
+            ->create();
 
-        $this->signIn();
+//        $project = factory(Project::class)->create(['owner_id' => auth()->id()]);
+//
+//        $task = $project->addTask('test task');
 
-        $project = factory(Project::class)->create(['owner_id' => auth()->id()]);
-
-        $task = $project->addTask('test task');
-
-        $this->patch($task->path(), [
+        $this->patch($project->tasks->first()->path(), [
             'body' => 'changed',
             'completed' => true
         ]);
