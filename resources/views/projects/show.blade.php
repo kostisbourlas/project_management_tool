@@ -6,7 +6,7 @@
             <p class="text-gray-600 text-sm">
                 <a href="/projects" class="text-blue-500"> My Projects </a>/ {{ $project->title }}
             </p>
-            <a href="/projects/create" class="bg-blue-400 rounded-full shadow py-2 px-4 text-white text-sm">New Project</a>
+            <a href="{{ $project->path() . '/edit' }}" class="bg-blue-400 rounded-full shadow py-2 px-4 text-white text-sm">Edit Project</a>
         </div>
     </header>
 
